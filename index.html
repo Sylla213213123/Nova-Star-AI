@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nova Star AI</title>
+  <meta name="description" content="Nova Star AI answers your questions in plain words." />
+  <meta name="theme-color" content="#F2F4F8" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#0B1120" media="(prefers-color-scheme: dark)" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232B2FD9'/%3E%3Cpath d='M16 5l3 8 8 3-8 3-3 8-3-8-8-3 8-3z' fill='white'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --paper: #F2F4F8;
+      --ink: #0E1726;
+      --muted: #586277;
+      --line: #D2D8E3;
+      --accent: #2B2FD9;
+      --accent-ink: #FFFFFF;
+      --tint: #E3E6F8;
+      --font: "Bricolage Grotesque", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --paper: #0B1120;
+        --ink: #EDF0F8;
+        --muted: #9AA4B8;
+        --line: #26304A;
+        --accent: #8F94FF;
+        --accent-ink: #0B1120;
+        --tint: #1A2140;
+      }
+    }
+
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--font);
+      font-optical-sizing: auto;
+      font-size: 1rem;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+    [hidden] { display: none !important; }
+    .wrap {
+      max-width: 60rem;
+      margin-inline: auto;
+      padding-inline: clamp(1.25rem, 5vw, 3rem);
+    }
+
+    /* Top bar */
+    .bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-block: 1.25rem;
+    }
+    .brand {
+      font-weight: 800;
+      font-size: 1.5rem;
+      letter-spacing: -0.02em;
+      font-variation-settings: "wdth" 80;
+      color: var(--ink);
+      text-decoration: none;
+    }
+    .reset {
+      font: inherit;
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: var(--ink);
+      background: transparent;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 0.45rem 1rem;
+      cursor: pointer;
+    }
+    .reset:hover { border-color: var(--ink); }
+
+    /* Hero: the one moment that gets the volume turned up */
+    .hero {
+      padding-top: clamp(2rem, 8vh, 5.5rem);
+      animation: rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    }
+    .hero h1 {
+      margin: 0;
+      font-weight: 800;
+      font-size: clamp(3.4rem, 11.5vw, 7.75rem);
+      line-height: 0.92;
+      letter-spacing: -0.03em;
+      font-variation-settings: "wdth" 75;
+      text-wrap: balance;
+    }
+    .hero p {
+      margin: 1.25rem 0 0;
+      max-width: 30rem;
+      font-size: clamp(1.4rem, 3.2vw, 2rem);
+      font-weight: 500;
+      line-height: 1.2;
+      letter-spacing: -0.01em;
+      color: var(--muted);
+    }
+    body:not(.started) .brand { visibility: hidden; }
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: none; }
+    }
+
+    /* Thread: questions are headlines, answers are body text */
+    .thread { padding-bottom: 2rem; }
+    .turn {
+      padding-block: 2rem;
+      border-top: 1px solid var(--line);
+      scroll-margin-top: 1rem;
+    }
+    .turn:first-child { border-top: 0; padding-top: 1rem; }
+    .q {
+      margin: 0;
+      font-weight: 700;
+      font-size: clamp(1.7rem, 4.6vw, 2.75rem);
+      line-height: 1.08;
+      letter-spacing: -0.02em;
+      font-variation-settings: "wdth" 80;
+      overflow-wrap: anywhere;
+    }
+    .a {
+      margin-top: 1.1rem;
+      max-width: 40rem;
+      font-size: 1.125rem;
+      line-height: 1.65;
+    }
+    .a p { margin: 0 0 1em; }
+    .a p:last-child { margin-bottom: 0; }
+    .a ul, .a ol { margin: 0 0 1em; padding-left: 1.4em; }
+    .a li { margin-bottom: 0.35em; }
+    .a code {
+      background: var(--tint);
+      padding: 0.1em 0.35em;
+      border-radius: 4px;
+      font-size: 0.92em;
+    }
+    .a pre {
+      background: var(--tint);
+      padding: 1rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+    .a pre code { background: none; padding: 0; }
+    .a.error { color: var(--muted); }
+    .wait { display: inline-flex; gap: 0.35rem; padding-block: 0.6rem; }
+    .wait i {
+      width: 0.55rem; height: 0.55rem; border-radius: 50%;
+      background: var(--accent);
+      animation: pulse 1.1s ease-in-out infinite;
+    }
+    .wait i:nth-child(2) { animation-delay: 0.15s; }
+    .wait i:nth-child(3) { animation-delay: 0.3s; }
+    @keyframes pulse {
+      0%, 80%, 100% { opacity: 0.2; }
+      40% { opacity: 1; }
+    }
+
+    /* Composer */
+    .dock { padding-top: 2.25rem; }
+    .field {
+      display: flex;
+      align-items: flex-end;
+      gap: 1rem;
+      border-bottom: 2px solid var(--ink);
+      padding-bottom: 0.8rem;
+    }
+    .field:focus-within {
+      border-color: var(--accent);
+      box-shadow: 0 2px 0 var(--accent);
+    }
+    textarea {
+      flex: 1;
+      min-width: 0;
+      resize: none;
+      border: 0;
+      outline: none;
+      padding: 0;
+      background: transparent;
+      color: var(--ink);
+      font: inherit;
+      font-size: clamp(1.4rem, 3.6vw, 2.4rem);
+      font-weight: 500;
+      line-height: 1.2;
+      letter-spacing: -0.01em;
+      max-height: 40vh;
+    }
+    textarea::placeholder { color: var(--muted); opacity: 0.75; }
+    .send {
+      flex: none;
+      font: inherit;
+      font-weight: 700;
+      font-size: 1.05rem;
+      padding: 0.8rem 1.6rem;
+      border: 0;
+      border-radius: 999px;
+      background: var(--accent);
+      color: var(--accent-ink);
+      cursor: pointer;
+    }
+    .send:hover:not(:disabled) { filter: brightness(1.1); }
+    .send:disabled { opacity: 0.35; cursor: not-allowed; }
+    .send:focus-visible, .reset:focus-visible, .suggest button:focus-visible, .brand:focus-visible {
+      outline: 3px solid var(--accent);
+      outline-offset: 3px;
+    }
+
+    .suggest { list-style: none; margin: 2.5rem 0 0; padding: 0; }
+    .suggest li { border-top: 1px solid var(--line); }
+    .suggest li:last-child { border-bottom: 1px solid var(--line); }
+    .suggest button {
+      display: block;
+      width: 100%;
+      text-align: left;
+      font: inherit;
+      font-size: clamp(1.05rem, 2.4vw, 1.3rem);
+      font-weight: 500;
+      color: var(--ink);
+      background: transparent;
+      border: 0;
+      padding: 1rem 0;
+      cursor: pointer;
+    }
+    .suggest button:hover { color: var(--accent); }
+
+    .note {
+      margin: 1.5rem 0 0;
+      padding-bottom: 2rem;
+      max-width: 36rem;
+      font-size: 0.875rem;
+      color: var(--muted);
+    }
+
+    /* Once a chat starts, the composer docks to the bottom */
+    body.started { display: flex; flex-direction: column; }
+    body.started main { flex: 1; width: 100%; }
+    body.started .dock {
+      position: sticky;
+      bottom: 0;
+      padding-top: 0.9rem;
+      background: var(--paper);
+      border-top: 1px solid var(--line);
+    }
+    body.started textarea { font-size: 1.15rem; font-weight: 400; }
+    body.started .field { padding-bottom: 0.6rem; align-items: center; }
+    body.started .send { padding: 0.6rem 1.3rem; font-size: 1rem; }
+    body.started .suggest { display: none; }
+    body.started .note {
+      margin-top: 0.6rem;
+      padding-bottom: calc(0.9rem + env(safe-area-inset-bottom));
+      font-size: 0.8rem;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .hero { animation: none; }
+      .wait i { animation: none; opacity: 0.6; }
+    }
+    @media (max-width: 30rem) {
+      .send { padding-inline: 1.2rem; }
+      textarea { font-size: 1.1rem; }
+    }
+  </style>
+</head>
+<body>
+  <header class="wrap bar">
+    <a class="brand" id="brand" href="./">Nova Star AI</a>
+    <button class="reset" id="reset" type="button" hidden>New chat</button>
+  </header>
+
+  <main class="wrap">
+    <section class="hero" id="hero">
+      <h1 id="headline">Nova Star AI</h1>
+      <p id="intro">Ask a question in plain words and get a straight answer.</p>
+    </section>
+    <div class="thread" id="thread" role="log" aria-live="polite" aria-label="Conversation"></div>
+  </main>
+
+  <div class="dock">
+    <div class="wrap">
+      <form id="form" autocomplete="off">
+        <label for="input" class="sr" style="position:absolute;left:-9999px">Your question</label>
+        <div class="field">
+          <textarea id="input" rows="1" maxlength="1000" placeholder="Type your question"></textarea>
+          <button class="send" id="send" type="submit" disabled>Ask</button>
+        </div>
+      </form>
+      <ul class="suggest" id="suggest"></ul>
+      <p class="note" id="note"></p>
+    </div>
+  </div>
+
+  <script>
+    /* ===== EDIT THIS BLOCK to make the site yours ===== */
+    const SITE = {
+      name: "Nova Star AI",
+      tagline: "Ask a question in plain words and get a straight answer.",
+      placeholder: "What do you want to know?",
+      suggestions: [
+        "How do airplanes stay in the air?",
+        "Explain compound interest like I'm 12.",
+        "What's the best way to start learning guitar?",
+        "Why is the sky blue at noon and red at sunset?"
+      ],
+      note: "Answers come from AI and can be wrong. Check anything important, and don't share passwords or private details."
+    };
+    /* ================================================= */
+
+    const $ = (id) => document.getElementById(id);
+    const hero = $("hero"), thread = $("thread"), form = $("form"),
+          input = $("input"), send = $("send"), reset = $("reset"), suggest = $("suggest");
+    const history = [];
+    let busy = false;
+
+    // Fill in the text from SITE
+    document.title = SITE.name;
+    $("brand").textContent = SITE.name;
+    $("headline").textContent = SITE.name;
+    $("intro").textContent = SITE.tagline;
+    $("note").textContent = SITE.note;
+    input.placeholder = SITE.placeholder;
+    SITE.suggestions.forEach((q) => {
+      const li = document.createElement("li");
+      const b = document.createElement("button");
+      b.type = "button";
+      b.textContent = q;
+      b.addEventListener("click", () => ask(q));
+      li.appendChild(b);
+      suggest.appendChild(li);
+    });
+
+    // Tiny, safe formatter for answers (escapes everything first)
+    function esc(s) {
+      return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+    function inline(s) {
+      return esc(s)
+        .replace(/`([^`]+)`/g, "<code>$1</code>")
+        .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+        .replace(/(^|[^*])\*([^*\n]+)\*/g, "$1<em>$2</em>");
+    }
+    function render(md) {
+      const lines = md.replace(/\r/g, "").split("\n");
+      let html = "", para = [], list = null, code = null;
+      const flushP = () => { if (para.length) { html += "<p>" + inline(para.join(" ")) + "</p>"; para = []; } };
+      const flushL = () => {
+        if (list) {
+          html += "<" + list.t + ">" + list.items.map((i) => "<li>" + inline(i) + "</li>").join("") + "</" + list.t + ">";
+          list = null;
+        }
+      };
+      for (const raw of lines) {
+        if (raw.trim().startsWith("```")) {
+          if (code === null) { flushP(); flushL(); code = []; }
+          else { html += "<pre><code>" + esc(code.join("\n")) + "</code></pre>"; code = null; }
+          continue;
+        }
+        if (code !== null) { code.push(raw); continue; }
+        const line = raw.trim();
+        let m;
+        if (!line) { flushP(); flushL(); continue; }
+        if ((m = line.match(/^[-*]\s+(.*)/))) {
+          flushP();
+          if (!list || list.t !== "ul") { flushL(); list = { t: "ul", items: [] }; }
+          list.items.push(m[1]); continue;
+        }
+        if ((m = line.match(/^\d+[.)]\s+(.*)/))) {
+          flushP();
+          if (!list || list.t !== "ol") { flushL(); list = { t: "ol", items: [] }; }
+          list.items.push(m[1]); continue;
+        }
+        if ((m = line.match(/^#{1,6}\s+(.*)/))) {
+          flushP(); flushL(); html += "<p><strong>" + inline(m[1]) + "</strong></p>"; continue;
+        }
+        flushL(); para.push(line);
+      }
+      if (code !== null) html += "<pre><code>" + esc(code.join("\n")) + "</code></pre>";
+      flushP(); flushL();
+      return html;
+    }
+
+    function resize() {
+      input.style.height = "auto";
+      input.style.height = input.scrollHeight + "px";
+    }
+    function refreshButton() {
+      send.disabled = busy || !input.value.trim();
+    }
+    function startChat() {
+      document.body.classList.add("started");
+      hero.hidden = true;
+      reset.hidden = false;
+    }
+    function addTurn(question) {
+      const turn = document.createElement("article");
+      turn.className = "turn";
+      const q = document.createElement("h2");
+      q.className = "q";
+      q.textContent = question;
+      const a = document.createElement("div");
+      a.className = "a";
+      a.innerHTML = '<span class="wait" role="status" aria-label="Working on your answer"><i></i><i></i><i></i></span>';
+      turn.append(q, a);
+      thread.appendChild(turn);
+      const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+      turn.scrollIntoView({ block: "start", behavior: calm ? "auto" : "smooth" });
+      return a;
+    }
+
+    async function ask(text) {
+      text = (text || "").trim();
+      if (!text || busy) return;
+      busy = true;
+      startChat();
+      const answer = addTurn(text);
+      history.push({ role: "user", content: text });
+      input.value = "";
+      resize();
+      refreshButton();
+
+      try {
+        const res = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ messages: history })
+        });
+        let data = {};
+        try { data = await res.json(); } catch (e) {}
+        if (!res.ok) throw new Error(data.error || "Couldn't get an answer. Try again.");
+        answer.innerHTML = render(data.reply || "");
+        history.push({ role: "assistant", content: data.reply || "" });
+      } catch (err) {
+        answer.classList.add("error");
+        answer.textContent = err instanceof TypeError
+          ? "Couldn't reach the server. Check your connection and try again."
+          : err.message;
+        history.pop();
+      } finally {
+        busy = false;
+        refreshButton();
+        if (matchMedia("(hover: hover)").matches) input.focus();
+      }
+    }
+
+    form.addEventListener("submit", (e) => { e.preventDefault(); ask(input.value); });
+    input.addEventListener("input", () => { resize(); refreshButton(); });
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey && !e.isComposing) {
+        e.preventDefault();
+        form.requestSubmit();
+      }
+    });
+    reset.addEventListener("click", () => {
+      history.length = 0;
+      thread.innerHTML = "";
+      document.body.classList.remove("started");
+      hero.hidden = false;
+      reset.hidden = true;
+      window.scrollTo({ top: 0 });
+      input.focus();
+    });
+
+    if (matchMedia("(hover: hover)").matches) input.focus();
+  </script>
+</body>
+</html>
